@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import Layout from '../Components/Layout';
 import RecipeCard from '../Components/RecipeCard';
+import ThreeButton from '../Components/ThreeButton';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
@@ -11,6 +12,7 @@ export default function Home() {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [hasPressed, setHasPressed] = useState(false);
 
     const fetchRandomMeal = async () => {
         setLoading(true);
@@ -19,6 +21,7 @@ export default function Home() {
             const response = await axios.get('/api/meals/random');
             setMeal(response.data.meal);
             setUserData(response.data.userData);
+            setHasPressed(true);
         } catch (err) {
             setError('Failed to fetch meal. Please try again.');
             console.error(err);
@@ -52,23 +55,8 @@ export default function Home() {
                     Explore delicious recipes from around the world
                 </motion.p>
 
-                <motion.div
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.3, type: "spring" }}
-                    className="flex justify-center"
-                >
-                    <button
-                        onClick={fetchRandomMeal}
-                        disabled={loading}
-                        className="group relative px-12 py-6 text-white text-xl font-bold rounded-2xl overflow-hidden bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 active:scale-95 transition-all duration-200 shadow-2xl hover:shadow-red-500/50 disabled:opacity-50 disabled:cursor-not-allowed relative z-50"
-                    >
-                        <span className="relative z-10 font-extrabold tracking-wide">{loading ? 'Loading...' : 'RANDOM MEALS'}</span>
-                        <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                            initial={false}
-                        />
-                    </button>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center">
+                    <ThreeButton onClick={fetchRandomMeal} disabled={loading} showLabel={!hasPressed} />
                 </motion.div>
 
                 {error && (

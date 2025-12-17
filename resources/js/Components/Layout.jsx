@@ -72,7 +72,7 @@ export default function Layout({ children }) {
             
             <footer className="container mx-auto px-4 pb-8 relative z-20">
                 <div className="mt-4 text-center text-white/70 text-sm">
-                    Inspired by GROUP 10: Baquiran, Daguio, Jonio, Sayahan
+                    
                 </div>
             </footer>
         </div>

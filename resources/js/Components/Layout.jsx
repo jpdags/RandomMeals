@@ -1,41 +1,13 @@
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-<<<<<<< Updated upstream
 import Background3D from './Background3D';
-=======
 import { Button } from '@/components/ui/button';
 import { Home, Heart, User } from 'lucide-react';
->>>>>>> Stashed changes
 
 export default function Layout({ children }) {
     const { auth } = usePage().props;
 
     return (
-<<<<<<< Updated upstream
-        <div className="min-h-screen bg-gradient-to-br from-red-950 via-gray-900 to-orange-950 relative overflow-hidden">
-            <Background3D />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/30 to-gray-900/60 pointer-events-none z-0" />
-            <header className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-50 shadow-lg relative">
-                <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link href="/" className="text-2xl font-bold text-white hover:text-red-400 transition-colors drop-shadow-lg">
-                        🍽️ Random Meals
-                    </Link>
-                    
-                    <div className="flex items-center gap-4">
-                        {auth?.user ? (
-                            <>
-                                <Link
-                                    href="/"
-                                    className="text-white/90 hover:text-red-400 transition-colors font-medium"
-                                >
-                                    Home
-                                </Link>
-                                <Link
-                                    href="/profile"
-                                    className="text-white/90 hover:text-red-400 transition-colors font-medium"
-                                >
-                                    Profile
-=======
         <div className="min-h-screen relative overflow-hidden vintage-bg flex flex-col">
             <div className="fixed inset-0 -z-10 overflow-hidden bg-picnic">
                 {/* Animated Sun */}
@@ -152,56 +124,30 @@ export default function Layout({ children }) {
                                 <Link href="/profile" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm">
                                     <User className="w-5 h-5 sm:w-4 sm:h-4" />
                                     <span className="hidden sm:inline">Profile</span>
->>>>>>> Stashed changes
                                 </Link>
                                 <Link
                                     href="/logout"
                                     method="post"
                                     as="button"
-<<<<<<< Updated upstream
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-lg hover:shadow-red-500/50"
-                                >
-                                    Logout
-=======
                                     className="relative inline-flex h-9 overflow-hidden rounded-lg p-[1px] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background ml-1 sm:ml-2"
                                 >
                                     <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,hsl(var(--secondary))_0%,hsl(var(--primary))_50%,hsl(var(--secondary))_100%)]" />
                                     <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-lg bg-card px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium text-foreground">
                                         Logout
                                     </span>
->>>>>>> Stashed changes
                                 </Link>
                             </>
                         ) : (
                             <>
-<<<<<<< Updated upstream
-                                <Link
-                                    href="/login"
-                                    className="text-white/90 hover:text-red-400 transition-colors font-medium"
-                                >
-                                    Login
-                                </Link>
-                                <Link
-                                    href="/register"
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-lg hover:shadow-red-500/50"
-                                >
-                                    Register
-                                </Link>
-=======
                                 <Button onClick={() => (window.location.href = '/login')} size="sm">Login</Button>
                                 <Button variant="outline" onClick={() => (window.location.href = '/register')} size="sm">Register</Button>
->>>>>>> Stashed changes
                             </>
                         )}
                     </div>
                 </nav>
             </header>
 
-<<<<<<< Updated upstream
-            <main className="container mx-auto px-4 py-8 relative z-20">
-=======
             <main className="relative z-20 flex-1">
->>>>>>> Stashed changes
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -211,19 +157,6 @@ export default function Layout({ children }) {
                     {children}
                 </motion.div>
             </main>
-<<<<<<< Updated upstream
-            
-            <footer className="container mx-auto px-4 pb-8 relative z-20">
-                <div className="mt-4 text-center text-white/70 text-sm">
-                    Inspired by GROUP 10: Baquiran, Daguio, Jonio, Sayahan
-                </div>
-            </footer>
         </div>
     );
 }
-
-=======
-        </div>
-    );
-}
->>>>>>> Stashed changes

@@ -12,8 +12,14 @@ export default function Home() {
     const [meal, setMeal] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    // Controls whether the hero title/description are shown.
+    // Hidden after first click, but comes back on refresh.
+    const [hasStarted, setHasStarted] = useState(false);
 
     const fetchRandomMeal = async () => {
+        if (!hasStarted) {
+            setHasStarted(true);
+        }
         setLoading(true);
         setError(null);
         try {
@@ -31,22 +37,24 @@ export default function Home() {
         <Layout>
             <main className="relative z-10 py-8 md:py-12 flex-1">
                 <div className="container mx-auto px-4 max-w-7xl">
-                    {/* Hero Section */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center mb-10 md:mb-14"
-                    >
-                        <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4 leading-tight">
-                            Discover Your Next
-                            <span className="block text-gradient">Delicious Meal</span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-body leading-relaxed">
-                            Press the button below to discover a random recipe from around the world. 
-                            Save your favorites and build your personal cookbook!
-                        </p>
-                    </motion.div>
+                    {/* Hero Section (hidden after first discover click this session) */}
+                    {!hasStarted && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="text-center mb-10 md:mb-14"
+                        >
+                            <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4 leading-tight">
+                                Discover Your Next
+                                <span className="block text-gradient">Delicious Meal</span>
+                            </h1>
+                            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-body leading-relaxed">
+                                Press the button below to discover a random recipe from around the world. 
+                                Save your favorites and build your personal cookbook!
+                            </p>
+                        </motion.div>
+                    )}
 
                     {/* Recipe Button - Show when no meal */}
                     {!meal && !loading && (

@@ -138,64 +138,66 @@ export default function RecipeCard({
           {!isExpanded ? (
             // Collapsed Card View
             <div className="book-cover">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto,1fr] gap-6 h-full">
+                {/* Top-left quadrant: image */}
                 <motion.div
-                  className="relative overflow-hidden rounded-xl"
+                  className="relative overflow-hidden rounded-xl md:row-span-2"
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.25 }}
                 >
                   <img
                     src={meal.strMealThumb}
                     alt={meal.strMeal}
-                    className="w-full h-64 md:h-72 object-cover shadow-vintage"
+                    className="w-full h-64 md:h-full object-cover shadow-vintage"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent" />
                 </motion.div>
-                
-                <div className="flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-3 leading-tight">
-                          {meal.strMeal}
-                        </h2>
-                        <div className="flex flex-wrap gap-2">
-                          {meal.strCategory && (
-                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent/20 text-foreground rounded-full text-sm font-medium border border-accent/30">
-                              <ChefHat className="w-3 h-3" />
-                              {meal.strCategory}
-                            </span>
-                          )}
-                          {meal.strArea && (
-                            <span className="inline-block px-3 py-1 bg-secondary/20 text-foreground rounded-full text-sm font-medium border border-secondary/30">
-                              {meal.strArea}
-                            </span>
-                          )}
-                        </div>
+
+                {/* Top-right quadrant: name, tags, description, favorite */}
+                <div className="flex flex-col">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-3 leading-tight">
+                        {meal.strMeal}
+                      </h2>
+                      <div className="flex flex-wrap gap-2">
+                        {meal.strCategory && (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent/20 text-foreground rounded-full text-sm font-medium border border-accent/30">
+                            <ChefHat className="w-3 h-3" />
+                            {meal.strCategory}
+                          </span>
+                        )}
+                        {meal.strArea && (
+                          <span className="inline-block px-3 py-1 bg-secondary/20 text-foreground rounded-full text-sm font-medium border border-secondary/30">
+                            {meal.strArea}
+                          </span>
+                        )}
                       </div>
-                      
-                      <motion.button
-                        onClick={toggleFavorite}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className={`heart-btn text-3xl ${isFavorite ? 'favorited' : ''}`}
-                      >
-                        <Heart 
-                          className={`w-8 h-8 transition-colors ${
-                            isFavorite 
-                              ? 'fill-destructive text-destructive' 
-                              : 'text-muted-foreground hover:text-destructive'
-                          }`}
-                        />
-                      </motion.button>
+                      <p className="mt-3 text-muted-foreground font-body leading-relaxed line-clamp-4">
+                        {meal.strInstructions?.substring(0, 260)}...
+                      </p>
                     </div>
-                    
-                    <p className="text-muted-foreground mb-6 line-clamp-4 font-body leading-relaxed">
-                      {meal.strInstructions?.substring(0, 200)}...
-                    </p>
+
+                    <motion.button
+                      onClick={toggleFavorite}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`heart-btn text-3xl ${isFavorite ? 'favorited' : ''}`}
+                    >
+                      <Heart
+                        className={`w-8 h-8 transition-colors ${
+                          isFavorite
+                            ? 'fill-destructive text-destructive'
+                            : 'text-muted-foreground hover:text-destructive'
+                        }`}
+                      />
+                    </motion.button>
                   </div>
-                  
-                    <div className="flex flex-wrap gap-3">
+                </div>
+
+                {/* Bottom row: actions spanning both columns */}
+                <div className="md:col-span-2 flex flex-wrap gap-3 md:justify-end md:items-end">
+                  <div className="flex flex-wrap gap-3">
                     <motion.button
                       onClick={() => setIsExpanded(true)}
                       whileHover={{ scale: 1.02 }}

@@ -1,11 +1,17 @@
+import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import Background3D from './Background3D';
 import { Button } from '@/components/ui/button';
-import { Home, Heart, User } from 'lucide-react';
+import { Home, Heart, User, ChevronDown, LogOut } from 'lucide-react';
 
 export default function Layout({ children }) {
-    const { auth } = usePage().props;
+    const { props, url } = usePage();
+    const { auth } = props;
+    const currentPath = url || '';
+    const isProfileOrFavorites =
+        currentPath.startsWith('/profile') || currentPath.startsWith('/favorites');
+    const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <div className="min-h-screen relative overflow-hidden vintage-bg flex flex-col">
@@ -105,42 +111,101 @@ export default function Layout({ children }) {
             </div>
             <header className="bg-card/95 backdrop-blur-md border-b-2 border-primary/20 sticky top-0 z-50 shadow-lg relative">
                 <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 text-2xl font-display font-bold text-foreground hover:text-primary transition-colors">
-                        <span className="text-3xl">📖</span>
-                        <span className="hidden sm:inline">Vintage Recipe</span>
+                    <Link href="/" className="flex items-center gap-2 text-2xl font-display font-bold text-foreground hover:text-primary transition-colors focus-vintage">
+                        <span className="text-3xl">🎲</span>
+                        <span className="hidden sm:inline">RandomMeals</span>
                     </Link>
                     
                     <div className="flex items-center gap-1 sm:gap-2">
                         {auth?.user ? (
                             <>
-                                <Link href="/" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm group">
-                                    <Home className="w-5 h-5 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">Home</span>
-                                </Link>
-                                <Link href="/favorites" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all font-medium text-xs sm:text-sm">
-                                    <Heart className="w-5 h-5 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">Favorites</span>
-                                </Link>
-                                <Link href="/profile" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm">
-                                    <User className="w-5 h-5 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">Profile</span>
-                                </Link>
-                                <Link
-                                    href="/logout"
-                                    method="post"
-                                    as="button"
-                                    className="relative inline-flex h-9 overflow-hidden rounded-lg p-[1px] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background ml-1 sm:ml-2"
-                                >
-                                    <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,hsl(var(--secondary))_0%,hsl(var(--primary))_50%,hsl(var(--secondary))_100%)]" />
-                                    <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-lg bg-card px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium text-foreground">
-                                        Logout
-                                    </span>
-                                </Link>
+                                {!isProfileOrFavorites && (
+                                    <>
+                                        <Link href="/" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm group focus-vintage">
+                                            <Home className="w-5 h-5 sm:w-4 sm:h-4" />
+                                            <span className="hidden sm:inline">Home</span>
+                                        </Link>
+                                        <Link href="/favorites" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all font-medium text-xs sm:text-sm focus-vintage">
+                                            <Heart className="w-5 h-5 sm:w-4 sm:h-4" />
+                                            <span className="hidden sm:inline">Favorites</span>
+                                        </Link>
+                                        <Link href="/profile" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm focus-vintage">
+                                            <User className="w-5 h-5 sm:w-4 sm:h-4" />
+                                            <span className="hidden sm:inline">Profile</span>
+                                        </Link>
+                                    </>
+                                )}
+
+                                {isProfileOrFavorites && (
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMenuOpen((open) => !open)}
+                                            className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-sm hover:bg-accent/40 transition-colors focus-vintage"
+                                        >
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground">
+                                                <User className="w-4 h-4" />
+                                            </div>
+                                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                        </button>
+
+                                        {menuOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -4 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -4 }}
+                                                className="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-popover shadow-lg overflow-hidden z-50"
+                                            >
+                                                <div className="py-1 text-sm">
+                                                    <Link
+                                                        href="/"
+                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-accent/60 text-foreground focus-vintage"
+                                                    >
+                                                        <Home className="w-4 h-4" />
+                                                        <span>Home</span>
+                                                    </Link>
+                                                    <Link
+                                                        href="/favorites"
+                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-accent/60 text-foreground focus-vintage"
+                                                    >
+                                                        <Heart className="w-4 h-4 text-destructive" />
+                                                        <span>Favorite</span>
+                                                    </Link>
+                                                    <Link
+                                                        href="/profile"
+                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-accent/60 text-foreground focus-vintage"
+                                                    >
+                                                        <User className="w-4 h-4" />
+                                                        <span>Profile</span>
+                                                    </Link>
+                                                    <Link
+                                                        href="/logout"
+                                                        method="post"
+                                                        as="button"
+                                                        className="flex items-center gap-2 w-full px-3 py-2 hover:bg-destructive/10 text-destructive text-left focus-vintage"
+                                                    >
+                                                        <LogOut className="w-4 h-4" />
+                                                        <span>Logout</span>
+                                                    </Link>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <>
-                                <Button onClick={() => (window.location.href = '/login')} size="sm">Login</Button>
-                                <Button variant="outline" onClick={() => (window.location.href = '/register')} size="sm">Register</Button>
+                                <Button onClick={() => (window.location.href = '/login')} size="sm" className="focus-vintage">
+                                    Login
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => (window.location.href = '/register')}
+                                    size="sm"
+                                    className="focus-vintage"
+                                >
+                                    Register
+                                </Button>
                             </>
                         )}
                     </div>

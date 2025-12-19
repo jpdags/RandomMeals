@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '../Components/Layout';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { User, Mail, Lock, Trash2 } from 'lucide-react';
@@ -127,6 +127,30 @@ export default function Profile() {
                                     <p className="text-sm text-muted-foreground">Send password reset link to email</p>
                                 </div>
                                 <span className="text-primary text-lg">→</span>
+                            </motion.button>
+
+                            {/* Logout Button */}
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full"
+                            >
+                                <Link
+                                    href="/logout"
+                                    method="post"
+                                    as="button"
+                                    className="w-full flex items-center gap-3 justify-between px-4 py-3 rounded-xl border-2 border-border hover:border-primary/40 bg-card hover:bg-primary/5 transition-all text-left"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                                            <Trash2 className="w-4 h-4" />
+                                        </span>
+                                        <div>
+                                            <p className="font-display font-semibold text-foreground">Logout</p>
+                                            <p className="text-xs text-muted-foreground">Sign out of your RandomMeals account</p>
+                                        </div>
+                                    </div>
+                                </Link>
                             </motion.button>
 
                             {/* Delete Account Button */}

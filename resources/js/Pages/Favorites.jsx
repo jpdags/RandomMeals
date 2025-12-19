@@ -12,6 +12,7 @@ export default function Favorites() {
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [removingIds, setRemovingIds] = useState([]);
 
     useEffect(() => {
         fetchFavorites();
@@ -34,10 +35,19 @@ export default function Favorites() {
     const handleRemoveFavorite = async (mealId) => {
         try {
             await axios.delete(`/api/favorites/${mealId}`);
-            setFavorites(favorites.filter(fav => fav.meal_id !== mealId));
-            if (selectedRecipe?.idMeal === mealId) {
-                setSelectedRecipe(null);
-            }
+
+            // Trigger breaking animation
+            setRemovingIds((prev) => [...prev, mealId]);
+
+            // After animation completes, remove from DOM/state
+            setTimeout(() => {
+                setFavorites((prev) => prev.filter((fav) => fav.meal_id !== mealId));
+                setRemovingIds((prev) => prev.filter((id) => id !== mealId));
+
+                if (selectedRecipe?.idMeal === mealId) {
+                    setSelectedRecipe(null);
+                }
+            }, 650);
         } catch (err) {
             console.error('Failed to remove favorite:', err);
             setError('Failed to remove from favorites');
@@ -137,7 +147,7 @@ export default function Favorites() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                     whileHover={{ scale: 1.02 }}
-                                    className="recipe-card p-6 cursor-pointer"
+                                    className={`recipe-card p-6 cursor-pointer favorite-card ${removingIds.includes(fav.meal_id) ? 'favorite-removing' : ''}`}
                                     onClick={() => viewRecipe(fav.meal_id)}
                                 >
                                     <div className="flex flex-col gap-4 h-full">

@@ -13,7 +13,7 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link 
           href="/"
-          className="flex items-center gap-2 text-2xl font-display font-bold text-foreground hover:text-primary transition-colors"
+          className="flex items-center gap-2 text-2xl font-display font-bold text-foreground hover:text-primary transition-colors focus-vintage"
         >
           <motion.span
             whileHover={{ rotate: [0, -10, 10, -10, 0] }}
@@ -38,7 +38,7 @@ function NavLink({ to, icon, label }) {
   return (
     <Link
       href={to}
-      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-foreground/80 hover:text-primary hover:bg-primary/10 transition-all font-medium text-sm"
+      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-foreground/80 hover:text-primary hover:bg-primary/10 transition-all font-medium text-sm focus-vintage"
     >
       {icon}
       <span className="hidden sm:inline">{label}</span>

@@ -12,7 +12,7 @@ export default function Header() {
     >
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link 
-          to="/"
+          href="/"
           className="flex items-center gap-2 text-2xl font-display font-bold text-foreground hover:text-primary transition-colors"
         >
           <motion.span
@@ -37,7 +37,7 @@ export default function Header() {
 function NavLink({ to, icon, label }) {
   return (
     <Link
-      to={to}
+      href={to}
       className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-foreground/80 hover:text-primary hover:bg-primary/10 transition-all font-medium text-sm"
     >
       {icon}

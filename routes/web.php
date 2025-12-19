@@ -39,6 +39,11 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Profile');
     })->name('profile');
 
+    // Favorites page
+    Route::get('/favorites', function () {
+        return Inertia::render('Favorites');
+    })->name('favorites.page');
+
     // Favorites
     Route::get('/api/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/api/favorites', [FavoriteController::class, 'store'])->name('favorites.store');

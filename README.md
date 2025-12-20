@@ -4,15 +4,15 @@ A dynamic Single-Page Application (SPA) that fetches random recipes from TheMeal
 
 ## Features
 
-- 🎲 **Random Meal Discovery** - Fetch random recipes with one click
-- 🔐 **Authentication System** - Login, Register, and Password Reset
-- 🔑 **Google OAuth** - Sign in with Google
-- ⭐ **User Ratings** - Rate recipes from 1-5 stars
-- 📝 **Personal Notes** - Save cooking experiences and tips
-- ❤️ **Favorites** - Save your favorite meals
-- 📱 **Responsive Design** - Works on desktop and mobile
-- 🎨 **Modern UI/UX** - Built with TailwindCSS and Framer Motion
-- 📖 **Flipbook Display** - Beautiful recipe card with expandable view
+- **Random Meal Discovery** - Fetch random recipes with one click
+- **Authentication System** - Login, Register, and Password Reset
+- **Google OAuth** - Sign in with Google
+- **User Ratings** - Rate recipes from 1-5 stars
+- **Personal Notes** - Save cooking experiences and tips
+- **Favorites** - Save your favorite meals
+- **Responsive Design** - Works on desktop and mobile
+- **Modern UI/UX** - Built with TailwindCSS and Framer Motion
+- **Flipbook Display** - Beautiful recipe card with expandable view
 
 ## Tech Stack
 
@@ -266,3 +266,4 @@ MIT
 - Laravel - [https://laravel.com/](https://laravel.com/)
 - React - [https://react.dev/](https://react.dev/)
 - Inertia.js - [https://inertiajs.com/](https://inertiajs.com/)
+- Spline - 

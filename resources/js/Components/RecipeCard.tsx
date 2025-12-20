@@ -64,7 +64,8 @@ export default function RecipeCard({
 
   const toggleFavorite = async () => {
     if (!auth?.user) {
-      router.visit('/login');
+      alert('Please login first to add favorites');
+      window.location.href = '/login';
       return;
     }
 
@@ -91,7 +92,8 @@ export default function RecipeCard({
 
   const handleRatingChange = async (newRating: number) => {
     if (!auth?.user) {
-      router.visit('/login');
+      alert('Please login first to rate recipes');
+      window.location.href = '/login';
       return;
     }
 
@@ -108,7 +110,8 @@ export default function RecipeCard({
 
   const handleNotesSave = async (newNotes: string) => {
     if (!auth?.user) {
-      router.visit('/login');
+      alert('Please login first to add notes');
+      window.location.href = '/login';
       return;
     }
 
@@ -174,20 +177,48 @@ export default function RecipeCard({
                         )}
                       </div>
                       <p className="mt-3 text-muted-foreground font-body leading-relaxed line-clamp-4">
-                        {meal.strInstructions?.substring(0, 260)}...
+                        {meal.strInstructions?.substring(0, 300)}...
                       </p>
+                      
+                      {/* Show up to 5 ingredients in preview */}
+                      {meal.ingredientsWithMeasures && meal.ingredientsWithMeasures.length > 0 && (
+                        <div className="mt-4 pt-3 border-t border-border/50">
+                          <p className="text-sm font-semibold text-foreground mb-2">Key Ingredients:</p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            {meal.ingredientsWithMeasures.slice(0, 5).map((item, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="text-primary">•</span>
+                                <span>{item.measure ? `${item.measure} ` : ''}<span className="text-foreground font-medium">{item.ingredient}</span></span>
+                              </li>
+                            ))}
+                          </ul>
+                          {meal.ingredientsWithMeasures.length > 5 && (
+                            <p className="text-xs text-muted-foreground mt-2 italic">+{meal.ingredientsWithMeasures.length - 5} more ingredients</p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     <motion.button
                       onClick={toggleFavorite}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className={`heart-btn text-3xl ${isFavorite ? 'favorited' : ''}`}
+                      className={`heart-btn text-3xl relative ${
+                        isFavorite ? 'favorited' : ''
+                      }`}
                     >
+                      {/* Glow effect for favorited heart */}
+                      {isFavorite && (
+                        <motion.div
+                          animate={{ opacity: [0.4, 0.8, 0.4] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute inset-0 rounded-full bg-destructive/30 blur-md"
+                        />
+                      )}
                       <Heart
-                        className={`w-8 h-8 transition-colors ${
+                        className={`w-8 h-8 transition-all relative z-10 ${
                           isFavorite
-                            ? 'fill-destructive text-destructive'
+                            ? 'fill-destructive text-destructive drop-shadow-lg'
                             : 'text-muted-foreground hover:text-destructive'
                         }`}
                       />
@@ -355,16 +386,28 @@ export default function RecipeCard({
                     </h3>
                     <motion.button
                       onClick={toggleFavorite}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all relative overflow-hidden ${
                         isFavorite 
-                          ? 'bg-destructive/10 text-destructive' 
-                          : 'bg-muted text-muted-foreground hover:text-destructive'
+                          ? 'bg-destructive text-white shadow-lg shadow-destructive/50' 
+                          : 'bg-muted text-muted-foreground hover:text-destructive hover:bg-muted/80'
                       }`}
                     >
-                      <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-                      {isFavorite ? 'Favorited' : 'Add to favorites'}
+                      {/* Glow background for favorited */}
+                      {isFavorite && (
+                        <motion.div
+                          animate={{ opacity: [0.3, 0.6, 0.3] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        />
+                      )}
+                      <Heart className={`w-5 h-5 relative z-10 transition-all ${
+                        isFavorite ? 'fill-current drop-shadow-md' : ''
+                      }`} />
+                      <span className="relative z-10 font-medium">
+                        {isFavorite ? 'Favorited ❤️' : 'Add to favorites'}
+                      </span>
                     </motion.button>
                   </div>
                   

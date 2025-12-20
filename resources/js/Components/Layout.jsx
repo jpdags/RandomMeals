@@ -1,17 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import Background3D from './Background3D';
 import { Button } from '@/components/ui/button';
-import { Home, Heart, User, ChevronDown, LogOut } from 'lucide-react';
+import { Home, Heart, User, ChevronDown, LogOut, Music } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 
 export default function Layout({ children }) {
     const { props, url } = usePage();
     const { auth } = props;
+    const [isPlaying, setIsPlaying] = useState(false);
+    const backgroundAudioRef = useRef(null);
+    const gameMusicLoop = '/audio/game-music-loop-7-145285.mp3';
     const currentPath = url || '';
     const isProfileOrFavorites =
         currentPath.startsWith('/profile') || currentPath.startsWith('/favorites');
     const [menuOpen, setMenuOpen] = useState(false);
+
+    // Initialize audio only once (globally) on component mount
+    useEffect(() => {
+        // Only create audio if it doesn't exist in window
+        if (!window.__audioInstance) {
+            const audio = new Audio(gameMusicLoop);
+            audio.loop = true;
+            audio.volume = 1;
+            window.__audioInstance = audio;
+            backgroundAudioRef.current = audio;
+
+            // Auto-play music when layout initializes
+            const playAudio = () => {
+                if (window.__audioInstance && window.__audioInstance.paused) {
+                    window.__audioInstance.play()
+                        .then(() => setIsPlaying(true))
+                        .catch(err => console.log('Audio play error:', err));
+                }
+            };
+
+            // Try to play on mount (may be blocked by browser autoplay policy)
+            playAudio();
+
+            // Also try playing on user interaction
+            window.addEventListener('click', playAudio, { once: true });
+            window.addEventListener('scroll', playAudio, { once: true });
+
+            return () => {
+                window.removeEventListener('click', playAudio);
+                window.removeEventListener('scroll', playAudio);
+            };
+        } else {
+            // Use existing global audio instance
+            backgroundAudioRef.current = window.__audioInstance;
+            // Check current playing state
+            setIsPlaying(!window.__audioInstance.paused);
+        }
+    }, []);
+
+    const handleVolumeChange = (e) => {
+        const newVolume = parseFloat(e.target.value);
+        // Always update the global audio instance
+        if (window.__audioInstance) {
+            window.__audioInstance.volume = newVolume;
+        } else if (backgroundAudioRef.current) {
+            backgroundAudioRef.current.volume = newVolume;
+        }
+    };
+
+    const toggleMusic = () => {
+        const audio = window.__audioInstance || backgroundAudioRef.current;
+        if (!audio) return;
+
+        if (isPlaying) {
+            audio.pause();
+            setIsPlaying(false);
+        } else {
+            audio.play()
+                .then(() => setIsPlaying(true))
+                .catch(err => console.log('Audio play error:', err));
+        }
+    };
 
     return (
         <div className="min-h-screen relative overflow-hidden vintage-bg flex flex-col">
@@ -109,27 +175,40 @@ export default function Layout({ children }) {
                     }}
                 />
             </div>
-            <header className="bg-card/95 backdrop-blur-md border-b-2 border-primary/20 sticky top-0 z-50 shadow-lg relative">
+            <header className="bg-gradient-to-r from-[#F5E6D3] to-[#E8D5C4] backdrop-blur-md border-b-2 border-[#d4c4b0] sticky top-0 z-50 shadow-lg relative">
                 <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 text-2xl font-display font-bold text-foreground hover:text-primary transition-colors focus-vintage">
-                        <span className="text-3xl">🎲</span>
+                    <Link href="/" className="flex items-center gap-2 text-2xl font-display font-bold text-[#4a3728] hover:text-[#b87225] transition-colors focus-vintage">
+                        <span className="text-3xl"></span>
                         <span className="hidden sm:inline">RandomMeals</span>
                     </Link>
                     
                     <div className="flex items-center gap-1 sm:gap-2">
+                        {/* Music Controls - Only show for logged-in users */}
+                        {auth?.user && (
+                            <motion.button
+                                onClick={toggleMusic}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="flex items-center justify-center w-10 h-10 rounded-lg text-[#4a3728] hover:text-[#b87225] hover:bg-[#b87225]/10 transition-all focus-vintage"
+                                title={isPlaying ? 'Pause Music' : 'Play Music'}
+                            >
+                                <Music className="w-5 h-5" />
+                            </motion.button>
+                        )}
+
                         {auth?.user ? (
                             <>
                                 {!isProfileOrFavorites && (
                                     <>
-                                        <Link href="/" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm group focus-vintage">
+                                        <Link href="/meals" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-[#4a3728]/70 hover:text-[#b87225] hover:bg-[#b87225]/10 transition-all font-medium text-xs sm:text-sm group focus-vintage">
                                             <Home className="w-5 h-5 sm:w-4 sm:h-4" />
                                             <span className="hidden sm:inline">Home</span>
                                         </Link>
-                                        <Link href="/favorites" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-all font-medium text-xs sm:text-sm focus-vintage">
+                                        <Link href="/favorites" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-[#4a3728]/70 hover:text-red-600 hover:bg-red-600/10 transition-all font-medium text-xs sm:text-sm focus-vintage">
                                             <Heart className="w-5 h-5 sm:w-4 sm:h-4" />
                                             <span className="hidden sm:inline">Favorites</span>
                                         </Link>
-                                        <Link href="/profile" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-foreground/70 hover:text-primary hover:bg-primary/10 transition-all font-medium text-xs sm:text-sm focus-vintage">
+                                        <Link href="/profile" className="flex flex-col sm:flex-row items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-[#4a3728]/70 hover:text-[#b87225] hover:bg-[#b87225]/10 transition-all font-medium text-xs sm:text-sm focus-vintage">
                                             <User className="w-5 h-5 sm:w-4 sm:h-4" />
                                             <span className="hidden sm:inline">Profile</span>
                                         </Link>
@@ -141,12 +220,12 @@ export default function Layout({ children }) {
                                         <button
                                             type="button"
                                             onClick={() => setMenuOpen((open) => !open)}
-                                            className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-sm hover:bg-accent/40 transition-colors focus-vintage"
+                                            className="flex items-center gap-2 rounded-full border border-[#d4c4b0] bg-[#F5E6D3] px-3 py-1.5 shadow-sm hover:bg-[#E8D5C4] transition-colors focus-vintage"
                                         >
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#b87225] to-[#a05f1f] flex items-center justify-center text-white">
                                                 <User className="w-4 h-4" />
                                             </div>
-                                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                            <ChevronDown className="w-4 h-4 text-[#8b7355]" />
                                         </button>
 
                                         {menuOpen && (
@@ -154,26 +233,26 @@ export default function Layout({ children }) {
                                                 initial={{ opacity: 0, y: -4 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -4 }}
-                                                className="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-popover shadow-lg overflow-hidden z-50"
+                                                    className="absolute right-0 mt-2 w-44 rounded-xl border border-[#d4c4b0] bg-[#F5E6D3] shadow-lg overflow-hidden z-50"
                                             >
                                                 <div className="py-1 text-sm">
                                                     <Link
-                                                        href="/"
-                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-accent/60 text-foreground focus-vintage"
+                                                        href="/meals"
+                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-[#E8D5C4] text-[#4a3728] focus-vintage"
                                                     >
                                                         <Home className="w-4 h-4" />
                                                         <span>Home</span>
                                                     </Link>
                                                     <Link
                                                         href="/favorites"
-                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-accent/60 text-foreground focus-vintage"
+                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-[#E8D5C4] text-[#4a3728] focus-vintage"
                                                     >
                                                         <Heart className="w-4 h-4 text-destructive" />
                                                         <span>Favorite</span>
                                                     </Link>
                                                     <Link
                                                         href="/profile"
-                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-accent/60 text-foreground focus-vintage"
+                                                        className="flex items-center gap-2 px-3 py-2 hover:bg-[#E8D5C4] text-[#4a3728] focus-vintage"
                                                     >
                                                         <User className="w-4 h-4" />
                                                         <span>Profile</span>
@@ -182,7 +261,7 @@ export default function Layout({ children }) {
                                                         href="/logout"
                                                         method="post"
                                                         as="button"
-                                                        className="flex items-center gap-2 w-full px-3 py-2 hover:bg-destructive/10 text-destructive text-left focus-vintage"
+                                                        className="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-100 text-red-600 text-left focus-vintage"
                                                     >
                                                         <LogOut className="w-4 h-4" />
                                                         <span>Logout</span>
@@ -195,14 +274,14 @@ export default function Layout({ children }) {
                             </>
                         ) : (
                             <>
-                                <Button onClick={() => (window.location.href = '/login')} size="sm" className="focus-vintage">
+                                <Button onClick={() => (window.location.href = '/login')} size="sm" className="bg-[#b87225] hover:bg-[#a05f1f] text-white focus-vintage">
                                     Login
                                 </Button>
                                 <Button
                                     variant="outline"
                                     onClick={() => (window.location.href = '/register')}
                                     size="sm"
-                                    className="focus-vintage"
+                                    className="border-[#b87225] text-[#b87225] hover:bg-[#b87225] hover:text-white focus-vintage"
                                 >
                                     Register
                                 </Button>

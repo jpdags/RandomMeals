@@ -16,33 +16,77 @@ export default function Profile() {
     const sendPasswordReset = async () => {
         setActionStatus(null);
         try {
-            await fetch('/forgot-password', {
+            const response = await fetch('/password/send-otp', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content,
+                },
                 body: JSON.stringify({ email: auth?.user?.email }),
             });
-            setActionStatus('Password reset link sent to your email.');
+            const data = await response.json();
+            if (response.ok) {
+                setActionStatus('✓ Verification code sent to your email. Redirecting...');
+                // Store email for next step
+                sessionStorage.setItem('resetEmail', auth?.user?.email);
+                // Redirect to verify OTP page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/verify-otp';
+                }, 2000);
+            } else {
+                setActionStatus(data.message || 'Failed to send verification code. Please try again.');
+                console.error('OTP Error:', data);
+            }
         } catch (e) {
-            setActionStatus('Failed to send reset link.');
-            console.error(e);
+            setActionStatus('Network error. Please check your connection and try again.');
+            console.error('Password Reset Error:', e);
         }
     };
 
     const deleteAccount = async () => {
-        const ok = window.confirm('Are you sure you want to delete your account? This cannot be undone.');
+        const password = window.prompt('Please enter your password to confirm account deletion:');
+        if (!password) return;
+
+        const ok = window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone and will delete all your data.');
         if (!ok) return;
+
+        setActionStatus(null);
         try {
-            await fetch('/account', { method: 'DELETE' });
-            window.location.href = '/';
+            const response = await fetch('/account/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content,
+                },
+                body: JSON.stringify({ password }),
+            });
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                setActionStatus('Server error. Please try again later.');
+                console.error('Response is not JSON:', response.status, response.statusText);
+                return;
+            }
+
+            const data = await response.json();
+            if (response.ok) {
+                setActionStatus('Account deleted successfully. Redirecting...');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                setActionStatus(data.message || 'Failed to delete account.');
+            }
         } catch (e) {
-            setActionStatus('Failed to delete account.');
+            setActionStatus('Network error. Please check your connection and try again.');
             console.error(e);
         }
     };
 
     return (
         <Layout>
-            <main className="relative z-10 py-8 md:py-12 flex-1">
+            <main className="relative z-10 py-8 md:py-12 flex-1 min-h-screen bg-gradient-to-b from-[#F5E6D3] to-[#E8D5C4]">
                 <div className="container mx-auto px-4 max-w-4xl">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -82,9 +126,7 @@ export default function Profile() {
                                     <Mail className="w-4 h-4" />
                                     <p className="font-body">{auth?.user?.email}</p>
                                 </div>
-                                <p className="text-sm text-muted-foreground font-body">
-                                    Member since {new Date(auth?.user?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-                                </p>
+                               
                             </div>
                         </div>
 
@@ -114,7 +156,7 @@ export default function Profile() {
                         <h3 className="text-2xl font-display font-bold text-foreground mb-6">Account Settings</h3>
                         
                         <div className="space-y-4">
-                            {/* Reset Password Button */}
+                            {/* Send Reset Code Button */}
                             <motion.button
                                 onClick={sendPasswordReset}
                                 whileHover={{ scale: 1.02 }}
@@ -123,23 +165,18 @@ export default function Profile() {
                             >
                                 <Lock className="w-5 h-5 text-primary group-hover:text-primary transition-colors" />
                                 <div className="text-left flex-1">
-                                    <p className="font-display font-semibold text-foreground">Reset Password</p>
-                                    <p className="text-sm text-muted-foreground">Send password reset link to email</p>
+                                    <p className="font-display font-semibold text-foreground">Send Reset Code</p>
+                                    <p className="text-sm text-muted-foreground">Get a verification code via email</p>
                                 </div>
                                 <span className="text-primary text-lg">→</span>
                             </motion.button>
 
                             {/* Logout Button */}
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="w-full"
-                            >
-                                <Link
-                                    href="/logout"
-                                    method="post"
-                                    as="button"
-                                    className="w-full flex items-center gap-3 justify-between px-4 py-3 rounded-xl border-2 border-border hover:border-primary/40 bg-card hover:bg-primary/5 transition-all text-left"
+                            <Link href="/logout" method="post">
+                                <motion.div
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="w-full flex items-center gap-3 justify-between px-4 py-3 rounded-xl border-2 border-border hover:border-primary/40 bg-card hover:bg-primary/5 transition-all text-left cursor-pointer"
                                 >
                                     <div className="flex items-center gap-3">
                                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10 text-destructive">
@@ -150,8 +187,9 @@ export default function Profile() {
                                             <p className="text-xs text-muted-foreground">Sign out of your RandomMeals account</p>
                                         </div>
                                     </div>
-                                </Link>
-                            </motion.button>
+                                    <span className="text-destructive text-lg">→</span>
+                                </motion.div>
+                            </Link>
 
                             {/* Delete Account Button */}
                             <motion.button

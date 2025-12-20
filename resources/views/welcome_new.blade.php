@@ -252,6 +252,12 @@
         🔊
     </button>
 
+    <!-- Background Audio -->
+    <audio id="bgMusic" loop>
+        <!-- Using a simple sine wave generated audio -->
+        <source src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==" type="audio/wav">
+    </audio>
+
     <div class="container">
         <div class="emojis-header">
             <span>🍕</span>
@@ -287,76 +293,65 @@
     </div>
 
     <script>
-        // Background Music Setup with Web Audio API
+        // Background Music Setup
+        const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('musicToggle');
         let isPlaying = false;
-        let soundSchedule = null;
 
-        // Initialize Web Audio API
+        // Initialize Web Audio API for ambient sound
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-        function createAmbientLoop() {
+        function createAmbientSound() {
             const now = audioContext.currentTime;
-            const duration = 3;
+            const duration = 2;
             
-            // Create pleasant ambient background
+            // Create a pleasant ambient sound with multiple oscillators
             const osc1 = audioContext.createOscillator();
             const osc2 = audioContext.createOscillator();
-            const gain1 = audioContext.createGain();
-            const gain2 = audioContext.createGain();
-            const masterGain = audioContext.createGain();
+            const gain = audioContext.createGain();
 
-            // Frequencies for pleasant harmony
             osc1.type = 'sine';
             osc2.type = 'sine';
-            osc1.frequency.value = 55;   // A1
-            osc2.frequency.value = 110;  // A2
-
-            // Fade envelope
-            gain1.gain.setValueAtTime(0.12, now);
-            gain1.gain.exponentialRampToValueAtTime(0.05, now + duration);
             
-            gain2.gain.setValueAtTime(0.08, now);
-            gain2.gain.exponentialRampToValueAtTime(0.03, now + duration);
-
-            masterGain.gain.setValueAtTime(0.15, now);
-
-            osc1.connect(gain1);
-            osc2.connect(gain2);
-            gain1.connect(masterGain);
-            gain2.connect(masterGain);
-            masterGain.connect(audioContext.destination);
-
+            osc1.frequency.value = 60;
+            osc2.frequency.value = 120;
+            
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+            
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioContext.destination);
+            
             osc1.start(now);
             osc2.start(now);
             osc1.stop(now + duration);
             osc2.stop(now + duration);
 
-            // Loop continuously if still playing
-            if (isPlaying) {
-                soundSchedule = setTimeout(createAmbientLoop, duration * 1000);
-            }
+            // Loop the sound
+            setTimeout(createAmbientSound, duration * 1000);
         }
 
         function toggleMusic() {
             if (isPlaying) {
-                isPlaying = false;
-                if (soundSchedule) clearTimeout(soundSchedule);
                 musicToggle.textContent = '🔇';
+                isPlaying = false;
             } else {
-                isPlaying = true;
-                createAmbientLoop();
+                createAmbientSound();
                 musicToggle.textContent = '🔊';
+                isPlaying = true;
             }
         }
 
         musicToggle.addEventListener('click', toggleMusic);
 
-        // Pop Sound Effect
+        // Pop Sound
+        const popAudio = new AudioContext || new webkitAudioContext;
+
         function playPop() {
-            const now = audioContext.currentTime;
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
+            const now = popAudio.currentTime;
+            const osc = popAudio.createOscillator();
+            const gain = popAudio.createGain();
 
             osc.frequency.setValueAtTime(800, now);
             osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -365,19 +360,19 @@
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             
             osc.connect(gain);
-            gain.connect(audioContext.destination);
+            gain.connect(popAudio.destination);
             
             osc.start(now);
             osc.stop(now + 0.1);
         }
 
-        // Navigate to home
+        // Navigate to home/meals
         function exploreMeals() {
             document.body.style.transition = "opacity 0.5s ease";
             document.body.style.opacity = "0.8";
 
             setTimeout(() => {
-                window.location.href = "/";
+                window.location.href = "/"; // Changed from /meals to /
             }, 500);
         }
 

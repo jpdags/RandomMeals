@@ -6,14 +6,13 @@ import RecipeButton from '../Components/RecipeButton';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Loader2, RefreshCw } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Home() {
     const { auth } = usePage().props;
     const [meal, setMeal] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    // Controls whether the hero title/description are shown.
-    // Hidden after first click, but comes back on refresh.
     const [hasStarted, setHasStarted] = useState(false);
 
     const fetchRandomMeal = async () => {
@@ -35,7 +34,7 @@ export default function Home() {
 
     return (
         <Layout>
-            <main className="relative z-10 py-8 md:py-12 flex-1">
+            <main className="relative z-10 py-8 md:py-12 flex-1 min-h-screen bg-gradient-to-b from-[#F5E6D3] to-[#E8D5C4]">
                 <div className="container mx-auto px-4 max-w-7xl">
                     {/* Hero Section (hidden after first discover click this session) */}
                     {!hasStarted && (

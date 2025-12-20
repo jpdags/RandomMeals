@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import Layout from '../Components/Layout';
 import RecipeCard from '../Components/RecipeCard';
-import RecipeButton from '../Components/RecipeButton';
-import { motion, AnimatePresence } from 'framer-motion';
+import ThreeButton from '../Components/ThreeButton';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useEffect } from 'react';
@@ -13,7 +13,7 @@ export default function Home() {
     const [meal, setMeal] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [hasStarted, setHasStarted] = useState(false);
+    const [hasPressed, setHasPressed] = useState(false);
 
     const fetchRandomMeal = async () => {
         if (!hasStarted) {
@@ -24,6 +24,8 @@ export default function Home() {
         try {
             const response = await axios.get('/api/meals/random');
             setMeal(response.data.meal);
+            setUserData(response.data.userData);
+            setHasPressed(true);
         } catch (err) {
             setError('Failed to fetch meal. Please try again.');
             console.error(err);
@@ -55,37 +57,9 @@ export default function Home() {
                         </motion.div>
                     )}
 
-                    {/* Recipe Button - Show when no meal */}
-                    {!meal && !loading && (
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: 0.3, duration: 0.5 }}
-                            className="flex justify-center mb-12"
-                        >
-                            <RecipeButton onClick={fetchRandomMeal} disabled={loading} />
-                        </motion.div>
-                    )}
-
-                    {/* Loading State */}
-                    <AnimatePresence>
-                        {loading && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="flex flex-col items-center justify-center py-20"
-                            >
-                                <div className="relative">
-                                    <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                                    <div className="absolute inset-0 w-16 h-16 rounded-full bg-primary/20 animate-ping" />
-                                </div>
-                                <p className="mt-6 text-muted-foreground font-display text-xl">
-                                    Finding a delicious recipe...
-                                </p>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center">
+                    <ThreeButton onClick={fetchRandomMeal} disabled={loading} showLabel={!hasPressed} />
+                </motion.div>
 
                     {/* Error State */}
                     <AnimatePresence>
